@@ -1,28 +1,25 @@
-name: Deployment to Twilio Serverless
+name: Twilio Serverless testing
 
-on:
-  push:
-    branches:
-      - main
+on: [pull_request, push]
 
 jobs:
-  deploy:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macos-latest]
-        node-version: [10]
+ test:
+   runs-on: ${{ matrix.os }}
+   strategy:
+     matrix:
+       os: [macos-latest]
+       node-version: [10]
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v1
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-      - name: npm install and deploy
-        run: |
-          npm install
-          npm run deploy -- --account-sid ${{secrets.TWILIO_ACCOUNT_SID}} --auth-token ${{secrets.TWILIO_AUTH_TOKEN}} --override-existing-project
-        env:
-          CI: true
+   steps:
+     - name: Checkout code
+       uses: actions/checkout@v1
+     - name: Use Node.js version ${{ matrix.node-version }}
+       uses: actions/setup-node@v1
+       with:
+         node-version: ${{ matrix.node-version }}
+     - name: npm install, build, and test
+       run: |
+         npm install
+         npm run jest
+       env:
+         CI: true
